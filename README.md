@@ -1,5 +1,9 @@
 # GeoParser
 
+**Note:** This README was updated by Daisy for MEMEX usability and reproducibility.
+
+# GeoParser
+
 MEMEX GeoParser Project.
 
 ## Environment Requirements
