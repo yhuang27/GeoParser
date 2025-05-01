@@ -1,127 +1,54 @@
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/MBoustani/GeoParser/master/logo.png"  width="250"/>
-</p>
-
 # GeoParser
-The Geoparser is a software tool that can process information from any type of file, extract geographic coordinates, and visualize locations on a map. Users who are interested in seeing a geographical representation of information or data can choose to search for locations using the Geoparser, through a search index or by uploading files from their computer. The Geoparser will parse the files and visualizes cities or latitude-longitude points on the map. After the information is parsed and points are plotted on the map, users are able to filter their results by density, or by searching a key word and applying a "facet" to the parsed information. On the map, users can click on location points to reveal more information about the location and how it is related to their search.
 
-## Installation (Docker)
-  1. `docker build -t nasajplmemex/geo-parser --no-cache -f Dockerfile . `
-  2. `docker-compose up -d`
-  3. Visit `http://localhost:8000` on your browser
+MEMEX GeoParser Project.
 
-## Try it out to help fight COVID!
-GeoParser has been updated with a new easy to use Docker install, and also [an example to download and run the COVID-19 literature data and view the locations](https://github.com/nasa-jpl-memex/GeoParser/wiki/Sample:-COVID19-publication-data-parsing). Use that example to explore and test out GeoParser on a real example and view locations from that dataset.
+## Environment Requirements
 
-## Installation (manually)
+- Python 2.7
+- Django 1.8 (tested with 1.8.19)
+- pip (legacy version compatible with Python 2.7)
+- Java 8 (required for Gazetteer services)
 
-### Requirements
- 1. Python 2.7
- 2. pip 
- 3. Django
- 4. [Tika Python](http://github.com/chrismattmann/tika-python)
+**Note:** 
+- Modern systems (e.g., Mac M1/M2 chips) may encounter Docker build failures due to architecture mismatches.
+- It is recommended to use prebuilt Docker images whenever possible to avoid dependency issues.
 
-### Install Requirements
+To set up a Python 2.7 virtual environment using pyenv:
 
- 1. Install python requirements
-```
+```bash
+pyenv install 2.7.18
+pyenv virtualenv 2.7.18 geoparser-env
+pyenv activate geoparser-env
 pip install -r requirements.txt
 ```
 
-### How to Run the Application
+## Docker Installation Tips
 
-  1. Run Solr
-    Change directory to where you cloned the project
+If you face problems building Docker images locally, you can pull the prebuilt image:
+
+```bash
+docker pull nasajplmemex/geo-parser
+docker run -p 9998:9998 nasajplmemex/geo-parser
+```
+
+This method avoids most local build issues and speeds up the deployment process.
+
+## Quick Start
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/nasa-jpl-memex/GeoParser.git
     ```
-    cd Solr/solr-5.3.1/
-    ./bin/solr start
+2. Navigate to the project directory.
+3. Set up Python 2.7 environment and install dependencies.
+4. (Optional) Start Gazetteer and Solr services if needed.
+5. Run Django server:
+    ```bash
+    python manage.py runserver
     ```
-  2. Clone lucene-geo-gazetteer repo
-      ```
-      git clone https://github.com/chrismattmann/lucene-geo-gazetteer.git
-      cd lucene-geo-gazetteer
-      mvn install assembly:assembly
-      add lucene-geo-gazetteer/src/main/bin to your PATH environment variable
-      ```
-      make sure it is working
-      ```
-      lucene-geo-gazetteer --help
-      usage: lucene-geo-gazetteer
-       -b,--build <gazetteer file>           The Path to the Geonames
-                                             allCountries.txt
-       -h,--help                             Print this message.
-       -i,--index <directoryPath>            The path to the Lucene index
-                                             directory to either create or read
-       -s,--search <set of location names>   Location names to search the
-                                             Gazetteer for
-      ```
+6. Visit `http://localhost:8000` to access the GeoParser Web UI.
 
-  3. You will now need to build a Gazetteer using the Geonames.org dataset. (1.2 GB)
-      ```
-      cd lucene-geo-gazetteer
-      curl -O http://download.geonames.org/export/dump/allCountries.zip
-      unzip allCountries.zip
-      lucene-geo-gazetteer -i geoIndex -b allCountries.txt
-      ```
-      make sure it is working
-      ```
-      lucene-geo-gazetteer -s Pasadena Texas
-      [
-      {"Texas" : [
-      "Texas",
-      "-91.92139",
-      "18.05333"
-      ]},
-      {"Pasadena" : [
-      "Pasadena",
-      "-74.06446",
-      "4.6964"
-      ]}
-      ]
-      ```
-  Now start lucene-geo-gazetteer server
-```
-lucene-geo-gazetteer -server
-```
-  4. Run tika server as mentioned in `https://cwiki.apache.org/confluence/display/TIKA/GeoTopicParser` on port `8001`. 
-     Port can be configured via [config.txt](https://github.com/MBoustani/GeoParser/blob/master/config.txt)   
+## Additional Notes
 
-  5. Make sure you can extract locations from Tika Server
-
-  `curl -T /path/to/polar.geot -H "Content-Disposition: attachment; filename=polar.geot" http://localhost:8001/rmeta`   
-  
-  You can obtain [file here] (https://raw.githubusercontent.com/chrismattmann/geotopicparser-utils/master/geotopics/polar.geot)   
-
-  Output should be this
-```
-[
-   {
-      "Content-Type":"application/geotopic",
-      "Geographic_LATITUDE":"39.76",
-      "Geographic_LONGITUDE":"-98.5",
-      "Geographic_NAME":"United States",
-      "Optional_LATITUDE1":"27.33931",
-      "Optional_LONGITUDE1":"-108.60288",
-      "Optional_NAME1":"China",
-      "X-Parsed-By":[
-         "org.apache.tika.parser.DefaultParser",
-         "org.apache.tika.parser.geo.topic.GeoParser"
-      ],
-      "X-TIKA:parse_time_millis":"1634",
-      "resourceName":"polar.geot"
-   }
-]
-```
-   6. Run Django server
-    ```python manage.py runserver```
-
-   7. Open in browser [http://localhost:8000/](http://localhost:8000/)
-       *Note : Please refer to the wiki page on this github repository which can act as a guide for you on how to use GeoParser.*
-
-## Technologies we Use
-  - [Apache Tika](https://github.com/chrismattmann/tika-python)
-  - [Lucene Geo Gazetteer](https://github.com/chrismattmann/lucene-geo-gazetteer)
-  - [Apache Solr](http://lucene.apache.org/solr/)
-
-
+- Ensure that your Gazetteer service is running and properly indexed using GeoNames data.
+- For Tika Server integration, ensure correct `config.txt` setup for geo endpoint configurations.
