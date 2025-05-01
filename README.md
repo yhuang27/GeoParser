@@ -1,4 +1,3 @@
-# GeoParser
 
 **Note:** This README was updated by Daisy for MEMEX usability and reproducibility.
 
